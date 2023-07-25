@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: winelight-app
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: wine-portal
+          image: felayo/wine-portal:v1.0.0
+          ports:
+            - containerPort: 3000
+          env:
+          - name: NODE_ENV
+            value: "development"
+          - name: AWS_ACCESS_KEY_ID
+            value: "AKIASTLVRTEUSPLHH4MW"
+          - name: AWS_SECRET_ACCESS_KEY
+            value: "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"

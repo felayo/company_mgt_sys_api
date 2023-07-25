@@ -1,0 +1,10 @@
+Dockerfile
+Dockerfile.dev
+Dockerfile.prod
+node_modules
+npm-debug.log
+README.md
+.git
+yarn-error.log
+docker*.yml
+.gitignore

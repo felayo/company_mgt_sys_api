@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  # Node API Services
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: winelight_container
+    image: felayo/wine-portal:v1.0.0
+    expose:
+      - 3000
+    ports:
+      - 3000:3000
+    environment:
+      AWS_ACCESS_KEY_ID: AKIASTLVRTEUSPLHH4MW
+      AWS_SECRET_ACCESS_KEY: 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
+      NODE_ENV: development
+    command: npm run dev
