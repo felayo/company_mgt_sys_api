@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 
 const errorHandler = require("./middleware/error");
+const { logger } = require("./middleware/logger");
+const corsOptions = require('./config/corsOptions')
 
 // import routes
 const auth = require("./routes/auth/auth");
@@ -11,10 +13,10 @@ const adminRouteCtrl = require("./routes/admin/adminCombineRoute");
 const vehicleRoute = require("./routes/vehicles/vehicleCombineRoute");
 
 const app = express();
-
+app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.get("/api", (req, res) => {
   res.send(

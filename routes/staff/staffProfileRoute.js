@@ -6,6 +6,7 @@ const {
   updateStaffProfile,
   deleteStaffProfile,
   uploadDocument,
+  removeStaffDoc
 } = require("../../controllers/staff/staffProfile");
 
 const { upload } = require("../../middleware/multer");
@@ -26,6 +27,8 @@ router.post("/", cpUpload, createStaffProfile);
 router.put("/", upload.single("avatar"), updateStaffProfile);
 
 router.put("/upload", upload.any(), uploadDocument);
+
+router.put("/documents/:id", removeStaffDoc);
 
 router.delete("/", deleteStaffProfile); // delete profile on dashboard
 

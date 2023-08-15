@@ -25,6 +25,10 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
     select: false
   },
+  active: {
+    type: Boolean,
+    default: true
+  },
   otp: String,
   otpExpiresAt: Date,
   createdAt: {
@@ -50,7 +54,7 @@ UserSchema.pre('save', async function (next) {
 
 // Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function () {
-  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: this._id, role: this.role, email: this.email }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE
   });
 };

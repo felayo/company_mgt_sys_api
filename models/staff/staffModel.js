@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const StaffSchema = new mongoose.Schema(
   {
     name: String,
-    username: String,
     phone: String,
     hiredDate: Date,
     exitDate: Date,
