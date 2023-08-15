@@ -7,7 +7,7 @@ exports.getStaffProfile = asyncHandler(async (req, res, next) => {
 
   const staff = await Staff.findOne({ user: userId }).populate({
     path: "user",
-    select: "email",
+    select: "email active",
     model: "User",
   });
   if (!staff)
@@ -43,16 +43,15 @@ exports.createStaffProfile = asyncHandler(async (req, res, next) => {
       return {
         name: file.fieldname,
         file: file.location,
-      }
-    })
+      };
+    });
 
     req.body.avatar = avatar;
     req.body.documents = documents;
   }
 
-
   req.body.user = userId;
-  
+
   staff = await Staff.create(req.body);
   res.status(201).json({
     success: true,
@@ -60,7 +59,6 @@ exports.createStaffProfile = asyncHandler(async (req, res, next) => {
     data: staff,
   });
 });
-
 
 exports.updateStaffProfile = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
@@ -94,7 +92,6 @@ exports.uploadDocument = asyncHandler(async (req, res, next) => {
   const files = req.files;
   const staffId = req.user.id;
   const staff = await Staff.findOne({ user: staffId });
-
   if (!staff) {
     return next(
       new ErrorResponse("No staff account was found for this user", 404)
@@ -136,3 +133,25 @@ exports.deleteStaffProfile = asyncHandler(async (req, res, next) => {
     message: "Account deleted successfully!",
   });
 });
+
+// write logic to remove a document in doc array
+exports.removeStaffDoc = asyncHandler(async (req, res, next) => {
+  const staffID = req.user.id;
+  const staff = await Staff.findOne({ user: staffID });
+  if (!staff)
+    return next(
+      new ErrorResponse("No staff account was found for this user", 404)
+    );
+
+  await Staff.updateOne(
+    { user: staffID },
+    { $pull: { documents: { _id: req.params.id } } }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "document removed successfully!",
+  });
+});
+
+
