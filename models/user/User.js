@@ -1,50 +1,49 @@
-const crypto = require('crypto');
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const crypto = require("crypto");
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const UserSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: [true, 'Please add an email'],
+    required: [true, "Please add an email"],
     unique: true,
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      'Please add a valid email'
-    ]
+      "Please add a valid email",
+    ],
   },
   role: {
     type: String,
-    enum: ['staff', 'admin', 'hr'],
-    default: 'staff',
-
+    enum: ["staff", "admin", "hr"],
+    default: "staff",
   },
   password: {
     type: String,
-    required: [true, 'Please add a password'],
+    required: [true, "Please add a password"],
     minlength: 6,
-    select: false
+    select: false,
   },
   active: {
     type: Boolean,
-    default: true
+    default: true,
   },
   otp: String,
   otpExpiresAt: Date,
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // Encrypt password using bcrypt
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
     next();
   }
   // if the role is "admin" and the document is new, throw an error
-  if (this.role === 'admin' && this.isNew) {
-    const err = new Error('Cannot create user with admin role');
+  if (this.role === "admin" && this.isNew) {
+    const err = new Error("Cannot create user with admin role");
     return next(err);
   }
 
@@ -54,9 +53,15 @@ UserSchema.pre('save', async function (next) {
 
 // Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function () {
-  return jwt.sign({ id: this._id, role: this.role, email: this.email }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE
-  });
+  const accessToken = jwt.sign(
+    { id: this._id, role: this.role, email: this.email },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_JWT_EXPIRE,
+    }
+  );
+
+  return accessToken;
 };
 
 // Match user entered password to hashed password in database
@@ -67,13 +72,13 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 // Generate and hash password token
 UserSchema.methods.getResetPasswordToken = function () {
   // Generate token
-  const resetToken = crypto.randomBytes(20).toString('hex');
+  const resetToken = crypto.randomBytes(20).toString("hex");
 
   // Hash token and set to resetPasswordToken field
   this.resetPasswordToken = crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(resetToken)
-    .digest('hex');
+    .digest("hex");
 
   // Set expire
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
@@ -81,4 +86,4 @@ UserSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);

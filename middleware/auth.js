@@ -13,7 +13,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
       token = authHeader.split(" ")[1];
 
       // verified token returns user id
-      const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
 
       // find user's obj in db and assign to the req.user
