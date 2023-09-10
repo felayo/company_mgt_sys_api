@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require('cookie-parser')
+const app = express();
 
 const errorHandler = require("./middleware/error");
 const { logger } = require("./middleware/logger");
@@ -12,11 +14,13 @@ const staffRouteCtrl = require("./routes/staff/staffCombineRoute");
 const adminRouteCtrl = require("./routes/admin/adminCombineRoute");
 const vehicleRoute = require("./routes/vehicles/vehicleCombineRoute");
 
-const app = express();
+
 app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors(corsOptions));
+app.use(cookieParser())
+
 
 app.get("/api", (req, res) => {
   res.send(

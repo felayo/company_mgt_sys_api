@@ -46,12 +46,12 @@ exports.login = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-exports.refresh = (req, res, next) => {
+exports.refresh = (req, res) => {
   const cookies = req.cookies;
 
-  if (!cookies?.token) return res.status(401).json({ message: "Unauthorized" });
+  if (!cookies?.jwt) return res.status(401).json({ message: "Unauthorized no cookie" });
 
-  const refreshToken = cookies.token;
+  const refreshToken = cookies.jwt;
 
   jwt.verify(
     refreshToken,
@@ -63,9 +63,10 @@ exports.refresh = (req, res, next) => {
         email: decoded.email,
       }).exec();
 
-      if (!foundUser) return res.status(401).json({ message: "Unauthorized" });
 
-      const accessToken = jwt.sign(
+      if (!foundUser) return res.status(401).json({ message: "Unauthorized no user" });
+
+      const token = jwt.sign(
         { id: foundUser._id, role: foundUser.role, email: foundUser.email },
         process.env.ACCESS_TOKEN_SECRET,
         {
@@ -73,7 +74,7 @@ exports.refresh = (req, res, next) => {
         }
       );
 
-      res.json({ accessToken });
+      res.json({ token });
     })
   );
 };
@@ -92,7 +93,6 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-
 exports.logout = asyncHandler(async (req, res, next) => {
   res.cookie("token", "none", {
     expires: new Date(0),
@@ -101,7 +101,7 @@ exports.logout = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: 'Logged out successfully'
+    message: "Logged out successfully",
   });
 });
 
@@ -124,13 +124,12 @@ const sendTokenResponse = (user, statusCode, res) => {
     ),
     httpOnly: true,
     sameSite: "None", //cross-site cookie
+    secure: true
   };
 
-  if (process.env.NODE_ENV === "production") {
-    options.secure = true;
-  }
+  
 
-  res.status(statusCode).cookie("token", refreshToken, options).json({
+  res.status(statusCode).cookie("jwt", refreshToken, options).json({
     success: true,
     token,
   });
