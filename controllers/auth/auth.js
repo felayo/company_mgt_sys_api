@@ -49,7 +49,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 exports.refresh = (req, res) => {
   const cookies = req.cookies;
 
-  if (!cookies?.jwt) return res.status(401).json({ message: "Unauthorized no cookie" });
+  if (!cookies?.jwt) return res.status(401).json({ message: "Unauthorized" });
 
   const refreshToken = cookies.jwt;
 
@@ -63,8 +63,7 @@ exports.refresh = (req, res) => {
         email: decoded.email,
       }).exec();
 
-
-      if (!foundUser) return res.status(401).json({ message: "Unauthorized no user" });
+      if (!foundUser) return res.status(401).json({ message: "Unauthorized" });
 
       const token = jwt.sign(
         { id: foundUser._id, role: foundUser.role, email: foundUser.email },
@@ -93,17 +92,12 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-exports.logout = asyncHandler(async (req, res, next) => {
-  res.cookie("token", "none", {
-    expires: new Date(0),
-    httpOnly: true,
-  });
-
-  res.status(200).json({
-    success: true,
-    message: "Logged out successfully",
-  });
-});
+exports.logout = (req, res) => {
+  const cookies = req.cookies;
+  if (!cookies?.jwt) return res.sendStatus(204); //No content
+  res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
+  res.json({ success: true, message: "Cookie cleared" });
+};
 
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
@@ -124,10 +118,8 @@ const sendTokenResponse = (user, statusCode, res) => {
     ),
     httpOnly: true,
     sameSite: "None", //cross-site cookie
-    secure: true
+    secure: true,
   };
-
-  
 
   res.status(statusCode).cookie("jwt", refreshToken, options).json({
     success: true,

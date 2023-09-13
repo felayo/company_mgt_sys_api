@@ -10,7 +10,7 @@ const adminDeptRoute = require("./adminDeptRoute");
 
 // use routes
 router.use(protect);
-router.use(authorize("admin"));
+router.use(authorize("admin", "manager"));
 
 router.use("/staffs", adminStaffRoute); // admin staff routes
 router.use("/departments/staff", adminDeptRecordRoute);

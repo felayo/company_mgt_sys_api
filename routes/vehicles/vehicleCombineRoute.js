@@ -10,7 +10,7 @@ const MaintenanceRecordRoute = require("./maintenanceRecordRoute");
 
 // use routes
 router.use(protect);
-router.use(authorize("admin", "hr"));
+router.use(authorize("admin", "manager"));
 
 router.use("/users", vehicleUserRoute);
 router.use('/records', vehicleRecordRoute);

@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["staff", "admin", "hr"],
+    enum: ["employee", "admin", "manager"],
     default: "staff",
   },
   password: {
@@ -41,8 +41,8 @@ UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
   }
-  // if the role is "admin" and the document is new, throw an error
-  if (this.role === "admin" && this.isNew) {
+  // if the role is "admin" or "manager" and the document is new, throw an error
+  if (this.role === "admin" || this.role === "manager" && this.isNew) {
     const err = new Error("Cannot create user with admin role");
     return next(err);
   }
