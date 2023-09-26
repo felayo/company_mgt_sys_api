@@ -16,7 +16,7 @@ const UserSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["employee", "admin", "manager"],
-    default: "staff",
+    default: "employee",
   },
   password: {
     type: String,
@@ -24,6 +24,7 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
+  username: { type: String, required: true, unique: [true, "username already exist"] },
   active: {
     type: Boolean,
     default: true,
@@ -42,8 +43,8 @@ UserSchema.pre("save", async function (next) {
     next();
   }
   // if the role is "admin" or "manager" and the document is new, throw an error
-  if (this.role === "admin" || this.role === "manager" && this.isNew) {
-    const err = new Error("Cannot create user with admin role");
+  if (this.role === "admin" || (this.role === "manager" && this.isNew)) {
+    const err = new Error("Cannot create user with admin or manager role");
     return next(err);
   }
 
@@ -54,7 +55,7 @@ UserSchema.pre("save", async function (next) {
 // Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function () {
   const accessToken = jwt.sign(
-    { id: this._id, role: this.role, email: this.email },
+    { id: this._id, role: this.role, email: this.email, username: this.username },
     process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_JWT_EXPIRE,

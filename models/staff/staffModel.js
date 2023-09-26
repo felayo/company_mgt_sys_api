@@ -2,7 +2,9 @@ const mongoose = require("mongoose");
 
 const StaffSchema = new mongoose.Schema(
   {
-    name: String,
+    firstName: String,
+    lastName: String,
+    middleName: String,
     phone: String,
     hiredDate: Date,
     exitDate: Date,

@@ -7,7 +7,7 @@ exports.getStaffProfile = asyncHandler(async (req, res, next) => {
 
   const staff = await Staff.findOne({ user: userId }).populate({
     path: "user",
-    select: "email active",
+    select: "email active username",
     model: "User",
   });
   if (!staff)

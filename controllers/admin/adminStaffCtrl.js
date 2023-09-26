@@ -6,7 +6,7 @@ const asyncHandler = require("express-async-handler");
 exports.adminGetAllStaff = asyncHandler(async (req, res, next) => {
   const staffs = await Staff.find().populate({
     path: 'user',
-    select: 'email',
+    select: 'email active username',
     model: 'User'
   })
   if (staffs.length < 1) return next(new ErrorResponse("No record yet!", 404));
