@@ -22,7 +22,7 @@ exports.adminGetOneStaff = asyncHandler(async (req, res, next) => {
   const staffProfileID = req.params.userId;
   const staff = await Staff.findById(staffProfileID).populate({
     path: 'user',
-    select: 'email',
+    select: 'email active',
     model: 'User'
   });
   if (!staff)
