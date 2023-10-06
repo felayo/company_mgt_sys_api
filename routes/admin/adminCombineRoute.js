@@ -4,16 +4,15 @@ const router = express.Router();
 const { protect, authorize } = require("../../middleware/auth");
 
 // import routes
-const adminStaffRoute = require("./adminStaffRoute.js");
-const adminDeptRecordRoute = require("./adminDeptRecordRoute");
+const adminEmployeeRoute = require("./adminEmployeeRoute.js");
 const adminDeptRoute = require("./adminDeptRoute");
+
 
 // use routes
 router.use(protect);
 router.use(authorize("admin", "manager"));
 
-router.use("/staffs", adminStaffRoute); // admin staff routes
-router.use("/departments/staff", adminDeptRecordRoute);
+router.use("/employees", adminEmployeeRoute); // admin staff routes
 router.use("/departments", adminDeptRoute);
 
 // export default router

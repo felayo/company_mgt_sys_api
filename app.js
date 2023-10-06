@@ -10,7 +10,7 @@ const corsOptions = require('./config/corsOptions')
 // import routes
 const auth = require("./routes/auth/auth");
 const users = require("./routes/users/users");
-const staffRouteCtrl = require("./routes/staff/staffCombineRoute");
+const employeeRouteCtrl = require("./routes/employee/combineRoutes");
 const adminRouteCtrl = require("./routes/admin/adminCombineRoute");
 const vehicleRoute = require("./routes/vehicles/vehicleCombineRoute");
 
@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", auth);
 app.use("/api/user", users);
-app.use("/api/staff", staffRouteCtrl);
+app.use("/api/employee", employeeRouteCtrl);
 app.use("/api/admin", adminRouteCtrl);
 app.use("/api/vehicle", vehicleRoute);
 
