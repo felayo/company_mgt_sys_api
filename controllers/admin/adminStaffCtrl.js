@@ -1,14 +1,19 @@
 const ErrorResponse = require("../../utils/errorResponse.js");
 const Staff = require("./../../models/staff/staffModel.js");
+const School = require("../../models/staff/schoolRecordModel");
+const Certification = require("../../models/staff/certificationModel");
+const EmploymentRecord = require("../../models/staff/employmentRecordsModel");
+const Guarantor = require("../../models/staff/guarantorModel");
+const NextOfKin = require("../../models/staff/nextOfKinModel");
 const User = require("../../models/user/User.js");
 const asyncHandler = require("express-async-handler");
 
 exports.adminGetAllStaff = asyncHandler(async (req, res, next) => {
   const staffs = await Staff.find().populate({
-    path: 'user',
-    select: 'email active username',
-    model: 'User'
-  })
+    path: "user",
+    select: "email active username",
+    model: "User",
+  });
   if (staffs.length < 1) return next(new ErrorResponse("No record yet!", 404));
 
   res.status(200).json({
@@ -19,19 +24,32 @@ exports.adminGetAllStaff = asyncHandler(async (req, res, next) => {
 });
 
 exports.adminGetOneStaff = asyncHandler(async (req, res, next) => {
-  const staffProfileID = req.params.userId;
-  const staff = await Staff.findById(staffProfileID).populate({
-    path: 'user',
-    select: 'email active',
-    model: 'User'
+  const userId = req.params.userId;
+  const employee = await Staff.findOne({ user: userId }).populate({
+    path: "user",
+    select: "email active",
+    model: "User",
   });
-  if (!staff)
-    return next(new ErrorResponse("No staff with that id was found!", 404));
+  if (!employee)
+    return next(new ErrorResponse("No employee with that id was found!", 404));
+
+  let schools = await School.find({ employee: userId });
+  let certifications = await Certification.find({ employee: userId });
+  let employment = await EmploymentRecord.find({ employee: userId });
+  let guarantor = await Guarantor.find({ employee: userId });
+  let nextofKin = await NextOfKin.find({ employee: userId });
 
   res.status(200).json({
     success: true,
     message: "Staff search successful",
-    data: staff,
+    data: {
+      profile: employee,
+      schools,
+      certifications,
+      employment,
+      guarantor,
+      nextofKin
+    },
   });
 });
 
@@ -49,9 +67,7 @@ exports.adminCreateStaffProfile = asyncHandler(async (req, res, next) => {
   // Confirm if the userId is present in user table
   let user = await User.findOne({ _id: userId });
   if (!user) {
-    return next(
-      new ErrorResponse("The user cannot be found!", 404)
-    );
+    return next(new ErrorResponse("The user cannot be found!", 404));
   }
 
   if (file) {
@@ -103,5 +119,34 @@ exports.adminDeleteStaff = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Staff deleted successfully",
+  });
+});
+
+exports.createSchoolRecords = asyncHandler(async (req, res, next) => {
+  const userId = req.params.userId;
+  const file = req.file;
+
+  if (file) {
+    const certificate = {
+      name: file.fieldname,
+      file: file.location,
+    };
+    req.body.certificate = certificate;
+  }
+
+  let employee = await Staff.findOne({ user: userId });
+
+  if (!employee) {
+    return next(new ErrorResponse("no employee profile found", 404));
+  }
+
+  req.body.employee = userId;
+
+  let school = await School.create(req.body);
+
+  res.status(201).json({
+    success: true,
+    message: "school record created successfully",
+    data: school,
   });
 });

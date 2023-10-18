@@ -6,13 +6,8 @@ const {
   adminCreateStaffProfile,
   adminUpdateStaff,
   adminDeleteStaff,
-} = require("../../controllers/admin/adminStaffCtrl");
-
-const {
   createSchoolRecords,
-  getEmployeeSchoolRecords
-} = require("../../controllers/admin/adminSchoolRecord");
-
+} = require("../../controllers/admin/adminStaffCtrl");
 
 const router = express.Router();
 
@@ -22,8 +17,5 @@ router.post("/:userId", adminCreateStaffProfile);
 router.put("/:userId", adminUpdateStaff);
 router.delete("/:userId", adminDeleteStaff);
 router.post("/:userId/schools", createSchoolRecords);
-router.get("/:userId/schools", getEmployeeSchoolRecords)
-
-
 
 module.exports = router;

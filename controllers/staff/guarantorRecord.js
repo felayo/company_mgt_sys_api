@@ -14,22 +14,3 @@ exports.createGuarantorRecord = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.getGuarantorRecord = asyncHandler(async (req, res, next) => {
-  const userId = req.user.id;
-
-  let guarantor = await Guarantor.find({ employee: userId });
-
-  if (guarantor == "") {
-    return next(
-      new ErrorResponse("No guarantor records found for this employee", 404)
-    );
-  }
-
-  res.status(200).json({
-    success: true,
-    message: "guarantor records successfully found for this employee",
-    data: guarantor,
-  });
-});
-
-

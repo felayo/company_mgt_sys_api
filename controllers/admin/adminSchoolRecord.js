@@ -31,21 +31,3 @@ exports.createSchoolRecords = asyncHandler(async (req, res, next) => {
     data: school,
   });
 });
-
-exports.getEmployeeSchoolRecords = asyncHandler(async (req, res, next) => {
-  const userId = req.params.userId;
-
-  let schools = await School.find({ employee: userId });
-
-  if (schools == "") {
-    return next(
-      new ErrorResponse("No School records found for this employee", 404)
-    );
-  }
-
-  res.status(200).json({
-    success: true,
-    message: "School records successfully found for this employee",
-    data: schools,
-  });
-});

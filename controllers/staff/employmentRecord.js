@@ -14,22 +14,3 @@ exports.createEmploymentRecord = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.getEmploymentRecord = asyncHandler(async (req, res, next) => {
-  const userId = req.user.id;
-
-  let employment = await EmploymentRecord.find({ employee: userId });
-
-  if (employment == "") {
-    return next(
-      new ErrorResponse("No past employment records found for this employee", 404)
-    );
-  }
-
-  res.status(200).json({
-    success: true,
-    message: "past employment records successfully found for this employee",
-    data: employment,
-  });
-});
-
-

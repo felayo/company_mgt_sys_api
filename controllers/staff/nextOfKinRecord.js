@@ -14,22 +14,3 @@ exports.createNextOfKinRecord = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.getNextOfKinRecord = asyncHandler(async (req, res, next) => {
-  const userId = req.user.id;
-
-  let nextOfKin = await NextOfKin.find({ employee: userId });
-
-  if (nextOfKin == "") {
-    return next(
-      new ErrorResponse("No nextOfKin records found for this employee", 404)
-    );
-  }
-
-  res.status(200).json({
-    success: true,
-    message: "nextOfKin records successfully found for this employee",
-    data: nextOfKin,
-  });
-});
-
-

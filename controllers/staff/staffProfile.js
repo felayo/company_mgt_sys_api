@@ -1,24 +1,42 @@
 const Staff = require("../../models/staff/staffModel.js");
+const School = require("../../models/staff/schoolRecordModel");
+const Certification = require("../../models/staff/certificationModel");
+const EmploymentRecord = require("../../models/staff/employmentRecordsModel");
+const Guarantor = require("../../models/staff/guarantorModel");
+const NextOfKin = require("../../models/staff/nextOfKinModel");
 const asyncHandler = require("express-async-handler");
 const ErrorResponse = require("../../utils/errorResponse");
 
 exports.getStaffProfile = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  const staff = await Staff.findOne({ user: userId }).populate({
+  const employee = await Staff.findOne({ user: userId }).populate({
     path: "user",
     select: "email active username",
     model: "User",
   });
-  if (!staff)
+  if (!employee)
     return next(
-      new ErrorResponse("No staff account was found for this user", 404)
+      new ErrorResponse("No employee account was found for this user", 404)
     );
+  
+  let schools = await School.find({ employee: userId });
+  let certifications = await Certification.find({ employee: userId });
+  let employment = await EmploymentRecord.find({ employee: userId });
+  let guarantor = await Guarantor.find({ employee: userId });
+  let nextofKin = await NextOfKin.find({ employee: userId });
 
   res.status(200).json({
     success: true,
     message: "Account Retrieved Successfully!",
-    data: staff,
+    data: {
+      "profile": employee,
+      schools,
+      certifications,
+      employment,
+      guarantor,
+      nextofKin
+    }
   });
 });
 
@@ -153,5 +171,28 @@ exports.removeStaffDoc = asyncHandler(async (req, res, next) => {
     message: "document removed successfully!",
   });
 });
+
+exports.createSchoolRecords = asyncHandler(async (req, res, next) => {
+  req.body.employee = req.user.id;
+  const file = req.file;
+
+  if (file) {
+    const certificate = {
+      name: file.fieldname,
+      file: file.location,
+    };
+    req.body.certificate = certificate;
+  }
+
+  let school = await School.create(req.body);
+
+  res.status(201).json({
+    success: true,
+    message: "school record created successfully",
+    data: school,
+  });
+});
+
+
 
 

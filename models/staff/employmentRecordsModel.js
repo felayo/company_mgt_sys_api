@@ -10,7 +10,7 @@ const PreviousEmploymentSchema = new mongoose.Schema(
     reason_for_leaving: String,
     employee: {
       type: mongoose.Schema.ObjectId,
-      ref: "Staff",
+      ref: "User",
       required: true,
     },
   },

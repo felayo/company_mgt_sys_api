@@ -10,6 +10,7 @@ const StaffSchema = new mongoose.Schema(
     hiredDate: Date,
     exitDate: Date,
     maritalStatus: String,
+    gender: String,
     report_to: String,
     address: String,
     city: String,

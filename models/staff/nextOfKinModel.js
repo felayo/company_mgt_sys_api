@@ -9,7 +9,7 @@ const NextOfKinSchema = new mongoose.Schema(
     email: String,
     employee: {
       type: mongoose.Schema.ObjectId,
-      ref: "Staff",
+      ref: "User",
       required: true,
     },
   },
