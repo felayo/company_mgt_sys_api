@@ -48,7 +48,7 @@ exports.adminGetOneStaff = asyncHandler(async (req, res, next) => {
       certifications,
       employment,
       guarantor,
-      nextofKin
+      nextofKin,
     },
   });
 });
@@ -73,10 +73,11 @@ exports.adminCreateStaffProfile = asyncHandler(async (req, res, next) => {
   if (file) {
     const avatar = {
       name: file.fieldname,
-      file: file.path,
+      file: file.location,
     };
     req.body.avatar = avatar;
   }
+
   req.body.user = req.params.userId;
   staff = await Staff.create(req.body);
   res.status(201).json({
@@ -87,15 +88,24 @@ exports.adminCreateStaffProfile = asyncHandler(async (req, res, next) => {
 });
 
 exports.adminUpdateStaff = asyncHandler(async (req, res, next) => {
-  const staffProfileID = req.params.userId;
-  let staff = await Staff.findById(staffProfileID);
+  const userId = req.params.userId;
+  const file = req.file;
+
+  let staff = await Staff.findOne({ user: userId });
 
   if (!staff)
     return next(
       new ErrorResponse("No staff account was found for this user", 404)
     );
 
-  staff = await Staff.findByIdAndUpdate(staffProfileID, req.body, {
+  if (file) {
+    const avatar = {
+      name: file.fieldname,
+      file: file.location,
+    };
+    req.body.avatar = avatar;
+  }
+  staff = await Staff.findOneAndUpdate({ user: userId }, req.body, {
     new: true,
     runValidators: true,
   });
@@ -104,6 +114,58 @@ exports.adminUpdateStaff = asyncHandler(async (req, res, next) => {
     success: true,
     message: "Staff updated successfully",
     data: staff,
+  });
+});
+
+
+exports.uploadDocument = asyncHandler(async (req, res, next) => {
+  const files = req.files;
+  const userId = req.params.userId;
+  const staff = await Staff.findOne({ user: userId });
+  if (!staff) {
+    return next(
+      new ErrorResponse("No staff account was found for this user", 404)
+    );
+  }
+
+  if (!files || !Array.isArray(files) || files.length === 0) {
+    return next(new ErrorResponse("No files were uploaded", 400));
+  }
+
+  const documents = files.map((file) => {
+    return {
+      name: file.fieldname,
+      file: file.location,
+    };
+  });
+
+  staff.documents.push(...documents);
+  await staff.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Files uploaded successfully",
+    data: staff,
+  });
+});
+
+exports.removeStaffDoc = asyncHandler(async (req, res, next) => {
+  const userId = req.params.userId;
+  const documentId = req.params.documentId;
+  const staff = await Staff.findOne({ user: userId });
+  if (!staff)
+    return next(
+      new ErrorResponse("No staff account was found for this user", 404)
+    );
+
+  await Staff.updateOne(
+    { user: userId },
+    { $pull: { documents: { _id: documentId } } }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "document removed successfully!",
   });
 });
 
