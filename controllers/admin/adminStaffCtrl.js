@@ -134,7 +134,7 @@ exports.uploadDocument = asyncHandler(async (req, res, next) => {
 
   const documents = files.map((file) => {
     return {
-      name: file.fieldname,
+      name: file.originalname,
       file: file.location,
     };
   });
