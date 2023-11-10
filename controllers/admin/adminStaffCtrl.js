@@ -57,7 +57,7 @@ exports.adminCreateStaffProfile = asyncHandler(async (req, res, next) => {
   const file = req.file;
   const userId = req.params.userId;
 
-  let staff = await Staff.findOne({ user: userId });
+  let staff = await Staff.findOne({ user: userId }).lean().exec();
   if (staff) {
     return next(
       new ErrorResponse("Account Profile already exists for this user!", 422)

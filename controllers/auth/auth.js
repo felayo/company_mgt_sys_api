@@ -118,9 +118,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   );
 
   const options = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-    ),
+    maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
     httpOnly: true,
     sameSite: "None", //cross-site cookie
     secure: true,

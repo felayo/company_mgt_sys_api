@@ -24,7 +24,11 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
-  username: { type: String, required: true, unique: [true, "username already exist"] },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   active: {
     type: Boolean,
     default: true,
@@ -55,7 +59,12 @@ UserSchema.pre("save", async function (next) {
 // Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function () {
   const accessToken = jwt.sign(
-    { id: this._id, role: this.role, email: this.email, username: this.username },
+    {
+      id: this._id,
+      role: this.role,
+      email: this.email,
+      username: this.username,
+    },
     process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_JWT_EXPIRE,
